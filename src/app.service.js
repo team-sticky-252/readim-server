@@ -9,12 +9,12 @@ export class AppService {
   getReadingTime(articleBody, userWPM) {
     const numOfWords = articleBody.split(" ").length;
     const rawReadingTime = (numOfWords / userWPM) * 60 * 1000;
-    let readingMinute = Math.floor(rawReadingTime / 1000 / 60);
+    let readingMinutes = Math.floor(rawReadingTime / 1000 / 60);
     let readingSeconds =
-      Math.round((rawReadingTime / 1000 - readingMinute * 60) * 0.1) * 10;
+      Math.round((rawReadingTime / 1000 - readingMinutes * 60) * 0.1) * 10;
 
     if (readingSeconds >= 45) {
-      readingMinute += 1;
+      readingMinutes += 1;
       readingSeconds = 0;
     } else if (readingSeconds >= 15) {
       readingSeconds = 30;
@@ -22,7 +22,7 @@ export class AppService {
       readingSeconds = 0;
     }
 
-    const readingTimePerMs = readingMinute * 60 * 1000 + readingSeconds * 1000;
+    const readingTimePerMs = readingMinutes * 60 * 1000 + readingSeconds * 1000;
 
     return readingTimePerMs;
   }

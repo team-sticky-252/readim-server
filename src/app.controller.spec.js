@@ -22,7 +22,7 @@ describe("AppController", () => {
       expect(appService.getReadingTime(articleBody, userWPM)).toBe(90000);
     });
 
-    it("should return 90,000ms", () => {
+    it("should return 60,000ms", () => {
       const appService = app.get(AppService);
       const userWPM = 202;
       const articleBody =
