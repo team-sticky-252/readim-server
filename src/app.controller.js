@@ -7,9 +7,4 @@ export class AppController {
   constructor(appService) {
     this.appService = appService;
   }
-
-  @Get()
-  getHello() {
-    return this.appService.getHello();
-  }
 }
