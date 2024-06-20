@@ -27,5 +27,6 @@ module.exports = {
     "no-param-reassign": 0,
     "import/prefer-default-export": "off",
     "class-methods-use-this": "off",
+    "no-useless-escape": 0,
   },
 };
