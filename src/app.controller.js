@@ -26,8 +26,8 @@ export class AppController {
         formattedURL,
       );
 
-      response.status(HttpStatus.OK.statusCode).send({
-        status: HttpStatus.OK.statusCode,
+      return response.status(HttpStatus.OK.statusCode).send({
+        statusCode: HttpStatus.OK.statusCode,
         data: {
           readingTime,
           ...siteOpenGraph,
@@ -37,14 +37,12 @@ export class AppController {
       if (error instanceof HttpError) {
         const { statusCode, message } = error.getError();
 
-        response.status(statusCode).send({ statusCode, message });
+        return response.status(statusCode).send({ statusCode, message });
       }
 
       const { statusCode, message } = HttpStatus.INTERNAR_SERVER_ERROR;
 
-      response.status(statusCode).send({ statusCode, message });
+      return response.status(statusCode).send({ statusCode, message });
     }
-
-    return null;
   }
 }
