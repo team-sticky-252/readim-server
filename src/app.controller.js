@@ -17,16 +17,16 @@ export class AppController {
 
     try {
       const formattedURL = this.appService.formatHttpURL(url);
+
       const { headElement, bodyElement } =
         await this.appService.getHtmlElement(formattedURL);
-
       const readingTime = this.appService.getReadingTime(bodyElement, wpm);
       const siteOpenGraph = this.appService.getSiteOpenGraph(
         headElement,
         formattedURL,
       );
 
-      return response.status(HttpStatus.OK.statusCode).send({
+      response.status(HttpStatus.OK.statusCode).send({
         status: HttpStatus.OK.statusCode,
         data: {
           readingTime,
@@ -36,10 +36,12 @@ export class AppController {
     } catch (error) {
       if (error instanceof HttpError) {
         const { statusCode, message } = error.getError();
+
         response.status(statusCode).send({ statusCode, message });
       }
 
       const { statusCode, message } = HttpStatus.INTERNAR_SERVER_ERROR;
+
       response.status(statusCode).send({ statusCode, message });
     }
 
