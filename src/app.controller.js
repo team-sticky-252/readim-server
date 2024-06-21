@@ -10,9 +10,9 @@ export class AppController {
     this.appService = appService;
   }
 
-  @Get("/readingTime")
+  @Get("/articleSummary")
   @Bind(Req(), Res())
-  async getReadingTime(request, response) {
+  async getArticleSummary(request, response) {
     const { url, wpm = 202 } = request.query;
 
     try {
