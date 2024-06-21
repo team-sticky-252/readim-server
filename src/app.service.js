@@ -47,8 +47,8 @@ export class AppService {
 
   removeExcludedTags(element) {
     const stack = [];
-
     const descendingChildren = Array.from(element.children).reverse();
+
     stack.push(...descendingChildren);
 
     while (stack.length > 0) {
@@ -57,9 +57,11 @@ export class AppService {
 
       if (EXCLUDED_TAGS_REGEX.test(tagName)) {
         const { parentElement } = currentElement;
+
         parentElement.removeChild(currentElement);
       } else {
         const reversedChildren = Array.from(currentElement.children).reverse();
+
         stack.push(...reversedChildren);
       }
     }
@@ -67,8 +69,8 @@ export class AppService {
 
   convertElementsWithRules(element) {
     const stack = [];
-
     const descendingChildren = Array.from(element.children).reverse();
+
     stack.push(...descendingChildren);
 
     while (stack.length > 0) {
@@ -78,6 +80,7 @@ export class AppService {
       this.convertCodeTagToText(currentElement);
 
       const reversedChildren = Array.from(currentElement.children).reverse();
+
       stack.push(...reversedChildren);
     }
   }
@@ -101,6 +104,7 @@ export class AppService {
 
     if (tagName === "pre") {
       const text = this.convertCodeToText(element.textContent);
+
       element.innerHTML = text;
     }
   }
@@ -108,8 +112,8 @@ export class AppService {
   reduceMainContentElements(body) {
     const mainContentElements = [];
     const stack = [];
-
     const reversedBodyChildren = Array.from(body.children).reverse();
+
     stack.push(...reversedBodyChildren);
 
     while (stack.length > 0) {
@@ -120,6 +124,7 @@ export class AppService {
         mainContentElements.push(currentElement);
       } else if (!EXCLUDED_TAGS_REGEX.test(tagName)) {
         const reversedChildren = Array.from(currentElement.children).reverse();
+
         stack.push(...reversedChildren);
       }
     }
@@ -169,10 +174,8 @@ export class AppService {
     const title =
       this.getOpenGraph("title", headElement) ||
       headElement.querySelector("title")?.textContent;
-
     const adress =
       headElement.querySelector("link[rel*='canonical']")?.href || url;
-
     const siteMatchName = adress.match(STIE_NAME_REGEX);
     const siteName =
       this.getOpenGraph("site_name", headElement) ||

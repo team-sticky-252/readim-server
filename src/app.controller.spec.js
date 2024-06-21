@@ -59,7 +59,6 @@ describe("AppController", () => {
       const url = "https://ko.react.dev/learn";
       const appService = app.get(AppService);
       const elements = await appService.getHtmlElement(url);
-
       const { headElement, bodyElement } = elements;
 
       expect(headElement.tagName).toBe("HEAD");
