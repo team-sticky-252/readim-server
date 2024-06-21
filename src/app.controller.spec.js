@@ -15,12 +15,20 @@ describe("AppController", () => {
   describe("Convert code to text", () => {
     it("should return a string of words with only words and spaces", () => {
       const appService = app.get(AppService);
-      expect(appService.convertCodeToText("let {top, bottom, left, right} = Directions;")).toBe("let top bottom left right Directions");
+      expect(
+        appService.convertCodeToText(
+          "let {top, bottom, left, right} = Directions;",
+        ),
+      ).toBe("let top bottom left right Directions");
     });
 
     it("should return a string of words with only words and spaces", () => {
       const appService = app.get(AppService);
-      expect(appService.convertCodeToText(`<div className="mb-4 overflow-scroll font-sans"></div>`)).toBe("div class Name mb 4 overflow scroll font sans div");
+      expect(
+        appService.convertCodeToText(
+          `<div className="mb-4 overflow-scroll font-sans"></div>`,
+        ),
+      ).toBe("div class Name mb 4 overflow scroll font sans div");
     });
   });
 
@@ -44,4 +52,3 @@ describe("AppController", () => {
     });
   });
 });
-
