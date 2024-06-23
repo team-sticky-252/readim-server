@@ -10,6 +10,10 @@ const ENTER_REGEX = /[\n]/g;
 const TAB_REGEX = /[\t]/g;
 const WHITESPACE_REGEX = /\s+/g;
 const STIE_NAME_REGEX = /https?:\/\/(?:www\.)?([^\.\/]+)/;
+const NODE = {
+  ELEMENT_NODE: 1,
+  TEXT_NODE: 3,
+};
 
 @Injectable()
 export class AppService {
@@ -98,9 +102,15 @@ export class AppService {
 
     const { nextSibling } = element;
 
-    if (nextSibling.nodeType === 3 && nextSibling.textContent === "\n") {
+    if (
+      nextSibling.nodeType === NODE.TEXT_NODE &&
+      nextSibling.textContent === "\n"
+    ) {
       element.innerHTML += " ";
-    } else if (element.nodeType === 1 && nextSibling.nodeType === 1) {
+    } else if (
+      element.nodeType === NODE.ELEMENT_NODE &&
+      nextSibling.nodeType === NODE.ELEMENT_NODE
+    ) {
       element.innerHTML += " ";
     }
   }
