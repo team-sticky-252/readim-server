@@ -29,6 +29,12 @@ export class AppService {
   }
 
   getReadingTime(bodyElement, wpm) {
+    const mainContent = this.getMainContent(bodyElement);
+
+    return this.calculateReadingTime(mainContent, wpm);
+  }
+
+  getMainContent(bodyElement) {
     const mainContentElements = this.reduceMainContentElements(bodyElement);
 
     const contents = mainContentElements.reduce((acc, element) => {
@@ -42,7 +48,7 @@ export class AppService {
       throw new HttpError(HttpStatus.PARSE_ERROR);
     }
 
-    return this.calculateReadingTime(contents.join(" "), wpm);
+    return contents.join(" ");
   }
 
   removeExcludedTags(element) {
