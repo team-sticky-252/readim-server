@@ -190,9 +190,9 @@ export class AppService {
     const title =
       this.getOpenGraph("title", headElement) ||
       headElement.querySelector("title")?.textContent;
-    const adress =
-      headElement.querySelector("link[rel*='canonical']")?.href || url;
-    const siteMatchName = adress.match(STIE_NAME_REGEX);
+    const faviconUrl =
+      headElement.querySelector("link[rel*='icon']")?.href || null;
+    const siteMatchName = url.match(STIE_NAME_REGEX);
     const siteName =
       this.getOpenGraph("site_name", headElement) ||
       (siteMatchName && siteMatchName[1]);
@@ -200,24 +200,18 @@ export class AppService {
     return {
       title,
       siteName,
-      url: adress,
-      faviconUrl: headElement.querySelector("link[rel*='icon']").href,
+      url,
+      faviconUrl,
     };
   }
 
   getOpenGraph(property, headElement) {
-    const content = headElement.querySelector(
+    return headElement.querySelector(
       `meta[property='og:${property}'], meta[name='${property}']`,
     )?.content;
-
-    return content;
   }
 
   formatHttpURL(url) {
-    if (!url.startsWith("https://") && !url.startsWith("http://")) {
-      return `https://${url}`;
-    }
-
-    return url;
+    return url.replace(/^(?!https?:\/\/)/, "https://");
   }
 }
