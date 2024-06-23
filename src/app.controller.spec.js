@@ -113,5 +113,44 @@ describe("AppController", () => {
         `<span id="first">하나 </span><span>둘</span>`,
       );
     });
+
+    it("outer articles should be the main content", () => {
+      const appService = app.get(AppService);
+      const html = `<!DOCTYPE html>
+        <html lang="en"><head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Document</title>
+        </head>
+        <body>
+          <main>
+            <article>
+              <h1>title</h1>
+              <section>section1</section>
+              <section>section2</section>
+              <article>
+                <div>div1</div>
+              </article>
+              <div>div2</div>
+            </article>
+            <article>
+              <div>div3</div>
+              <div>div4</div>
+            </article>
+            <div>div5</div>
+          </main>
+        </body>
+        </html>`.replace(/\s+/g, "");
+      const { JSDOM } = jsdom;
+      const dom = new JSDOM(html);
+      const bodyElement = dom.window.document.querySelector("body");
+
+      const mainContentElements =
+        appService.reduceMainContentElements(bodyElement);
+      const content = appService.getMainContent(bodyElement);
+
+      expect(mainContentElements.length).toBe(2);
+      expect(content).toBe("title section1 section2 div1 div2 div3 div4");
+    });
   });
 });
