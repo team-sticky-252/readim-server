@@ -56,10 +56,7 @@ export class AppService {
   }
 
   removeExcludedTags(element) {
-    const stack = [];
-    const descendingChildren = Array.from(element.children).reverse();
-
-    stack.push(...descendingChildren);
+    const stack = Array.from(element.children).reverse();
 
     while (stack.length > 0) {
       const currentElement = stack.pop();
@@ -78,10 +75,7 @@ export class AppService {
   }
 
   convertElementsWithRules(element) {
-    const stack = [];
-    const descendingChildren = Array.from(element.children).reverse();
-
-    stack.push(...descendingChildren);
+    const stack = Array.from(element.children).reverse();
 
     while (stack.length > 0) {
       const currentElement = stack.pop();
@@ -125,12 +119,9 @@ export class AppService {
     }
   }
 
-  reduceMainContentElements(body) {
+  reduceMainContentElements(bodyElement) {
     const mainContentElements = [];
-    const stack = [];
-    const reversedBodyChildren = Array.from(body.children).reverse();
-
-    stack.push(...reversedBodyChildren);
+    const stack = Array.from(bodyElement.children).reverse();
 
     while (stack.length > 0) {
       const currentElement = stack.pop();
