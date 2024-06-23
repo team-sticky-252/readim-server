@@ -9,7 +9,7 @@ const MAIN_CONTENT_TAGS_REGEX = /^(main|article|section)$/i;
 const ENTER_REGEX = /[\n]/g;
 const TAB_REGEX = /[\t]/g;
 const WHITESPACE_REGEX = /\s+/g;
-const STIE_NAME_REGEX = /https?:\/\/(?:www\.)?([^\.\/]+)/;
+const SITE_NAME_REGEX = /https?:\/\/(?:www\.)?([^\.\/]+)/;
 const NODE = {
   ELEMENT_NODE: 1,
   TEXT_NODE: 3,
@@ -204,7 +204,7 @@ export class AppService {
       headElement.querySelector("title")?.textContent;
     const faviconUrl =
       headElement.querySelector("link[rel*='icon']")?.href || null;
-    const siteMatchName = url.match(STIE_NAME_REGEX);
+    const siteMatchName = url.match(SITE_NAME_REGEX);
     const siteName =
       this.getOpenGraph("site_name", headElement) ||
       (siteMatchName && siteMatchName[1]);
