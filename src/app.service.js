@@ -128,7 +128,28 @@ export class AppService {
       const tagName = currentElement.tagName.toLowerCase();
 
       if (MAIN_CONTENT_TAGS_REGEX.test(tagName)) {
-        mainContentElements.push(currentElement);
+        const articleElementsInMain = Array.from(
+          currentElement.querySelectorAll("main article"),
+        );
+        const hasArticleInMain = articleElementsInMain.length > 0;
+
+        if (tagName === "main" && hasArticleInMain) {
+          const mainContentCandidates = [];
+
+          for (let i = 0; i < articleElementsInMain.length; i += 1) {
+            const isChildElement = mainContentCandidates.some((element) =>
+              element.contains(articleElementsInMain[i]),
+            );
+
+            if (!isChildElement) {
+              mainContentCandidates.push(articleElementsInMain[i]);
+            }
+          }
+
+          mainContentElements.push(...mainContentCandidates);
+        } else {
+          mainContentElements.push(currentElement);
+        }
       } else if (!EXCLUDED_TAGS_REGEX.test(tagName)) {
         const reversedChildren = Array.from(currentElement.children).reverse();
 
