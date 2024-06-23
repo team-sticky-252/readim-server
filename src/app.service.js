@@ -4,8 +4,8 @@ import jsdom from "jsdom";
 import { HttpError, HttpStatus } from "./utils/http";
 
 const EXCLUDED_TAGS_REGEX =
-  /^(button|img|nav|aside|footer|audio|canvas|embed|figure|iframe|map|area|noscript|object|option|optgroup|picture|progress|script|select|source|style|svg)$/i;
-const MAIN_CONTENT_TAGS_REGEX = /^(main|article|section|header)$/i;
+  /^(button|img|nav|aside|footer|audio|canvas|embed|iframe|map|area|noscript|object|option|optgroup|picture|progress|script|select|source|style|svg|meta)$/i;
+const MAIN_CONTENT_TAGS_REGEX = /^(main|article|section)$/i;
 const ENTER_REGEX = /[\n]/g;
 const TAB_REGEX = /[\t]/g;
 const WHITESPACE_REGEX = /\s+/g;
