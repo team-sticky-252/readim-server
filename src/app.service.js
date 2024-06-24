@@ -32,8 +32,14 @@ export class AppService {
     }
   }
 
-  getReadingTime(bodyElement, wpm) {
-    const mainContent = this.getMainContent(bodyElement);
+  getReadingTime(url, bodyElement, wpm) {
+    let mainContent = null;
+
+    if (url.includes("velog")) {
+      mainContent = this.getVelogMainContent(bodyElement);
+    } else {
+      mainContent = this.getMainContent(bodyElement);
+    }
 
     return this.calculateReadingTime(mainContent, wpm);
   }
@@ -225,5 +231,35 @@ export class AppService {
 
   formatHttpURL(url) {
     return url.replace(/^(?!https?:\/\/)/, "https://");
+  }
+
+  getVelogMainContent(bodyElement) {
+    const allElements = Array.from(bodyElement.querySelectorAll("*"));
+
+    const titleElement = allElements.find((element) => {
+      return (
+        typeof element.className === "string" &&
+        element.className.toLowerCase().includes("tbwpx")
+      );
+    });
+
+    const mainElements = allElements.filter((element) => {
+      return (
+        typeof element.className === "string" &&
+        element.className.toLowerCase().includes("dftzxp")
+      );
+    });
+
+    const velogMainArticle = titleElement
+      ? [titleElement, ...mainElements]
+      : mainElements;
+
+    const velogMainContent = velogMainArticle.reduce((acc, element) => {
+      this.convertElementsWithRules(element);
+
+      return acc.concat(this.parseElementIntoTextContent(element));
+    }, []);
+
+    return velogMainContent.join(" ");
   }
 }
