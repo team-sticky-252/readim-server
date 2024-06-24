@@ -33,13 +33,12 @@ export class AppService {
   }
 
   getReadingTime(url, bodyElement, wpm) {
-    let mainContent = null;
+    if (url.includes("velog.io")) {
+      const velogMainContent = this.getVelogMainContent(bodyElement);
 
-    if (url.includes("velog")) {
-      mainContent = this.getVelogMainContent(bodyElement);
-    } else {
-      mainContent = this.getMainContent(bodyElement);
+      return this.calculateReadingTime(velogMainContent, wpm);
     }
+    const mainContent = this.getMainContent(bodyElement);
 
     return this.calculateReadingTime(mainContent, wpm);
   }
@@ -234,19 +233,21 @@ export class AppService {
   }
 
   getVelogMainContent(bodyElement) {
+    const VELOG_TITLE_CLASS_NAME = "tbwpx";
+    const VELOG_MAIN_CLASS_NAME = "dftzxp";
     const allElements = Array.from(bodyElement.querySelectorAll("*"));
 
     const titleElement = allElements.find((element) => {
       return (
         typeof element.className === "string" &&
-        element.className.toLowerCase().includes("tbwpx")
+        element.className.toLowerCase().includes(VELOG_TITLE_CLASS_NAME)
       );
     });
 
     const mainElements = allElements.filter((element) => {
       return (
         typeof element.className === "string" &&
-        element.className.toLowerCase().includes("dftzxp")
+        element.className.toLowerCase().includes(VELOG_MAIN_CLASS_NAME)
       );
     });
 
