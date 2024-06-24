@@ -38,6 +38,7 @@ export class AppService {
 
       return this.calculateReadingTime(velogMainContent, wpm);
     }
+
     const mainContent = this.getMainContent(bodyElement);
 
     return this.calculateReadingTime(mainContent, wpm);
