@@ -1,4 +1,5 @@
 import { Controller, Dependencies, Get, Bind, Req, Res } from "@nestjs/common";
+import { v4 as uuid } from "uuid";
 
 import { AppService } from "./app.service";
 import { HttpError, HttpStatus } from "./utils/http";
@@ -33,6 +34,7 @@ export class AppController {
       return response.status(HttpStatus.OK.statusCode).send({
         statusCode: HttpStatus.OK.statusCode,
         data: {
+          id: uuid(),
           readingTime,
           ...siteOpenGraph,
           createDate: new Date().toISOString(),
