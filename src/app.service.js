@@ -208,8 +208,7 @@ export class AppService {
     const title =
       this.getOpenGraph("title", headElement) ||
       headElement.querySelector("title")?.textContent;
-    const faviconUrl =
-      headElement.querySelector("link[rel*='icon']")?.href || null;
+    const faviconUrl = headElement.querySelector("link[rel*='icon']")?.href;
     const siteMatchName = url.match(SITE_NAME_REGEX);
     const siteName =
       this.getOpenGraph("site_name", headElement) ||
