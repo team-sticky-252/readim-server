@@ -117,7 +117,8 @@ describe("AppController", () => {
     it("outer articles should be the main content", () => {
       const appService = app.get(AppService);
       const html = `<!DOCTYPE html>
-        <html lang="en"><head>
+        <html lang="en">
+        <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Document</title>
@@ -151,6 +152,76 @@ describe("AppController", () => {
 
       expect(mainContentElements.length).toBe(2);
       expect(content).toBe("title section1 section2 div1 div2 div3 div4");
+    });
+  });
+
+  describe("getVelogMainContents", () => {
+    it("velog have title & main content", () => {
+      const appService = app.get(AppService);
+      const html = `<!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Document</title>
+        </head>
+        <body>
+          <div id="root">
+            <div class="__jazzbar false false"></div>
+            <div class="sc-dpilbb sc-bBHHxi kTIDXm">
+              <div class="sc-bBHxTw jEdNvQ"></div>
+              <div style="margin-top: -64px; opacity: 0;" class="sc-cTA qQK bxsBRa"></div>
+              <div class="sc-TBWPX dXONqK sc-jQrDum fiOuRZ">
+                <div class="head-wrapper">
+                  <h1>Velog(벨로그) 본문 추출법</h1>
+                  <span>2024년 6월 24일</span>
+                </div>
+              </div>
+              <div class="sc-TBWPX dXONqK sc-kmQMED cALPIq"></div>
+              <div class="sc-dFtzxp bfzjcP">
+                <p>
+                  <img src="https://velog...png">
+                </p>
+                <h2 id="클래스 네임 규칙">난수로 보이지만 규칙이 있습니다</h2>
+                <span>클래스 명에 "TBWPX"를 포함하는 첫번째 div와</span>
+                <span>그 자식들만 title 정보를 담고 있습니다</span>
+              </div>
+              <div class="sc-TBWX dXONqK sc-djWRfJ bksdVp">
+                <div>
+                  <p>이하 나머지 "TBWX"를 포함하는 태그들은, 기타 정보를 담습니다</p>
+                </div>
+              </div>
+              <div class="sc-TBWPX dXONqK sc-fIosK dpmQGl"></div>
+              <div class="sc-dFtzxp bfzjcP">
+                <div class="sc-bxTejn FTZwa">
+                  <div class="sc-eGRUor gdnhbG atom-one">
+                    <p>그리고, 클래스명에 "dFtzxp"를 포함하는 div와</p>
+                      <span>그 자식요소들이</span>
+                    <p>본문 요소들을 담고 있습니다</p>
+                  </div>
+                </div>
+              </div>
+              <div class="sc-TBWPX dXONqK sc-brSvTw cgYvDI"></div>
+              <div class="sc-cLpAjG cFmnmV"></div>
+              <div class="sc-gslxeA eUVKAp"></div>
+            </div>
+          </div>
+        <script></script>
+        <script></script>
+        <script></script>
+        </body>
+        </html>`;
+      const { JSDOM } = jsdom;
+      const dom = new JSDOM(html);
+      const bodyElement = dom.window.document.querySelector("body");
+      console.log(bodyElement.innerHTML);
+      const velogMaincontent = appService
+        .getVelogMainContent(bodyElement)
+        .replace(/\s+/g, " ");
+
+      expect(velogMaincontent).toBe(
+        ` Velog(벨로그) 본문 추출법 2024년 6월 24일 난수로 보이지만 규칙이 있습니다 클래스 명에 "TBWPX"를 포함하는 첫번째 div와 그 자식들만 title 정보를 담고 있습니다 그리고, 클래스명에 "dFtzxp"를 포함하는 div와 그 자식요소들이 본문 요소들을 담고 있습니다 `,
+      );
     });
   });
 });
