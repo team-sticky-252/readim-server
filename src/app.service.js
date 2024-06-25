@@ -5,7 +5,20 @@ import { HttpError, HttpStatus } from "./utils/http";
 
 const EXCLUDED_TAGS_REGEX =
   /^(button|img|nav|aside|footer|audio|canvas|embed|iframe|map|area|noscript|object|option|optgroup|picture|progress|script|select|source|style|svg|meta)$/i;
+const EXCLUDED_CLASS_NAMES_REGEX =
+  /(button|btn|nav|footer|summary|author|comment|sns|share|card|activity|relate|another|reply|sr-only|post-switch|loof|revenue|act|tag|direction|og|notice)/i;
+const EXCLUDED_ID_REGEX = /(paging|player)/i;
 const MAIN_CONTENT_TAGS_REGEX = /^(main|article|section)$/i;
+const MAIN_CONTENT_CSS_REGEX =
+  /^(tt_article_useless_p_margin|area_view|contents_style|contents_style|article_skin)$/i;
+const MAIN_CONTENT_SELECTOR_NAME = [
+  "#article-view",
+  "#mArticle",
+  ".tt_article_useless_p_margin",
+  ".area_view",
+  ".contents_style",
+  ".article_skin",
+];
 const ENTER_REGEX = /[\n]/g;
 const TAB_REGEX = /[\t]/g;
 const WHITESPACE_REGEX = /\s+/g;
@@ -45,7 +58,7 @@ export class AppService {
   }
 
   getMainContent(bodyElement) {
-    const mainContentElements = this.reduceMainContentElements(bodyElement);
+    const mainContentElements = this.reduceSemanticMainContent(bodyElement);
 
     const contents = mainContentElements.reduce((acc, element) => {
       this.removeExcludedTags(element);
@@ -67,8 +80,18 @@ export class AppService {
     while (stack.length > 0) {
       const currentElement = stack.pop();
       const tagName = currentElement.tagName.toLowerCase();
+      const { className } = currentElement;
+      const { id } = currentElement;
 
       if (EXCLUDED_TAGS_REGEX.test(tagName)) {
+        const { parentElement } = currentElement;
+
+        parentElement.removeChild(currentElement);
+      } else if (EXCLUDED_ID_REGEX.test(id)) {
+        const { parentElement } = currentElement;
+
+        parentElement.removeChild(currentElement);
+      } else if (EXCLUDED_CLASS_NAMES_REGEX.test(className)) {
         const { parentElement } = currentElement;
 
         parentElement.removeChild(currentElement);
@@ -125,7 +148,7 @@ export class AppService {
     }
   }
 
-  reduceMainContentElements(bodyElement) {
+  reduceSemanticMainContent(bodyElement) {
     const mainContentElements = [];
     const stack = Array.from(bodyElement.children).reverse();
 
@@ -161,6 +184,42 @@ export class AppService {
 
         stack.push(...reversedChildren);
       }
+    }
+
+    return mainContentElements;
+  }
+
+  reduceNonSemanticMainContent(bodyElement) {
+    const mainContentElements = [];
+    const stack = Array.from(bodyElement.children).reverse();
+
+    while (stack.length > 0) {
+      const currentElement = stack.pop();
+      const { className } = currentElement;
+      const selectors = MAIN_CONTENT_SELECTOR_NAME.join(", ");
+
+      const articleElementsInMain = Array.from(
+        bodyElement.querySelectorAll(selectors),
+      );
+
+      if (MAIN_CONTENT_CSS_REGEX.test(className)) {
+        const mainContentCandidates = [];
+
+        for (let i = 0; i < articleElementsInMain.length; i += 1) {
+          const isChildElement = mainContentCandidates.some((element) =>
+            element.contains(articleElementsInMain[i]),
+          );
+
+          if (!isChildElement) {
+            mainContentCandidates.push(articleElementsInMain[i]);
+          }
+        }
+
+        mainContentElements.push(...mainContentCandidates);
+      }
+
+      const reversedChildren = Array.from(currentElement.children).reverse();
+      stack.push(...reversedChildren);
     }
 
     return mainContentElements;
@@ -262,5 +321,22 @@ export class AppService {
     }, []);
 
     return velogMainContent.join(" ");
+  }
+
+  getTistoryMainContent(bodyElement) {
+    let mainContentElements = this.reduceSemanticMainContent(bodyElement);
+
+    if (mainContentElements.length === 0) {
+      mainContentElements = this.reduceNonSemanticMainContent(bodyElement);
+    }
+
+    const mainArticle = mainContentElements.reduce((acc, element) => {
+      this.removeExcludedTags(element);
+      this.convertElementsWithRules(element);
+
+      return acc.concat(this.parseElementIntoTextContent(element));
+    }, []);
+
+    return mainArticle.join(" ").trim().replace(/\\/g, "");
   }
 }
