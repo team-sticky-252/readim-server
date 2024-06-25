@@ -147,7 +147,7 @@ describe("AppController", () => {
       const bodyElement = dom.window.document.querySelector("body");
 
       const mainContentElements =
-        appService.reduceMainContentElements(bodyElement);
+        appService.reduceSemanticMainContent(bodyElement);
       const content = appService.getMainContent(bodyElement);
 
       expect(mainContentElements.length).toBe(2);
@@ -214,13 +214,95 @@ describe("AppController", () => {
       const { JSDOM } = jsdom;
       const dom = new JSDOM(html);
       const bodyElement = dom.window.document.querySelector("body");
-      console.log(bodyElement.innerHTML);
+
       const velogMaincontent = appService
         .getVelogMainContent(bodyElement)
         .replace(/\s+/g, " ");
 
       expect(velogMaincontent).toBe(
         ` Velog(벨로그) 본문 추출법 2024년 6월 24일 난수로 보이지만 규칙이 있습니다 클래스 명에 "TBWPX"를 포함하는 첫번째 div와 그 자식들만 title 정보를 담고 있습니다 그리고, 클래스명에 "dFtzxp"를 포함하는 div와 그 자식요소들이 본문 요소들을 담고 있습니다 `,
+      );
+    });
+  });
+
+  describe("getTistoryMainContents", () => {
+    it("should remove excluded elements on semantic page", () => {
+      const appService = app.get(AppService);
+
+      const html = `<!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Document</title>
+        </head>
+        <body>
+          <article>
+            <p>article 태그의 하위 텍스트 노드를 가져옵니다.</p>
+            <div>
+              <p>특정 요소를 제외한 나머지 텍스트 노드를 가져옵니다.</p>
+            </div>
+            <div class="summary">
+              <div>클래스명에 제외해야 할 단어가 포함된 경우 해당 요소와 그 하위 요소는 출력되지 않습니다.</div>
+            </div>
+            <div id="paging">
+              <p>id명에 제외해야 할 단어가 포함된 경우 해당 요소와 하위 요소는 출력되지 않습니다.</p>
+              <div>
+                <p>하위요소는 출력되지 않습니다.</p>
+              </div>
+            </div>
+          </article>
+        </body>
+      </html>`;
+
+      const { JSDOM } = jsdom;
+      const dom = new JSDOM(html);
+      const bodyElement = dom.window.document.querySelector("body");
+
+      const tistoryMaincontent = appService.getTistoryMainContent(bodyElement);
+
+      expect(tistoryMaincontent).toBe(
+        "article 태그의 하위 텍스트 노드를 가져옵니다. 특정 요소를 제외한 나머지 텍스트 노드를 가져옵니다.",
+      );
+    });
+
+    it("should remove excluded elements on non-semantic page", () => {
+      const appService = app.get(AppService);
+
+      const html = `<!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Document</title>
+        </head>
+        <body>
+          <div class="tt_article_useless_p_margin">
+            <p>클래스명 tt_article_useless_p_margin을 본문(main)으로 판별하고 하위 텍스트 노드를 가져옵니다.</p>
+            <div>
+              <p>특정 요소를 제외한 나머지 텍스트 노드를 가져옵니다.</p>
+            </div>
+            <div class="footer">
+              <div>클래스명에 제외해야 할 단어가 포함된 경우 해당 요소와 그 하위 요소는 출력되지 않습니다.</div>
+            </div>
+            <div id="player">
+              <p>id명에 제외해야 할 단어가 포함된 경우 해당 요소와 하위 요소는 출력되지 않습니다.</p>
+              <div class="article">
+                <p>하위요소는 출력되지 않습니다.</p>
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>`;
+
+      const { JSDOM } = jsdom;
+      const dom = new JSDOM(html);
+      const bodyElement = dom.window.document.querySelector("body");
+
+      const tistoryMaincontent = appService.getTistoryMainContent(bodyElement);
+
+      expect(tistoryMaincontent).toBe(
+        "클래스명 tt_article_useless_p_margin을 본문(main)으로 판별하고 하위 텍스트 노드를 가져옵니다. 특정 요소를 제외한 나머지 텍스트 노드를 가져옵니다.",
       );
     });
   });
