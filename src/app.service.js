@@ -80,8 +80,7 @@ export class AppService {
     while (stack.length > 0) {
       const currentElement = stack.pop();
       const tagName = currentElement.tagName.toLowerCase();
-      const { className } = currentElement;
-      const { id } = currentElement;
+      const { className, id } = currentElement;
 
       if (EXCLUDED_TAGS_REGEX.test(tagName)) {
         const { parentElement } = currentElement;
