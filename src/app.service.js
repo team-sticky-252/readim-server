@@ -274,12 +274,12 @@ export class AppService {
 
   getSiteOpenGraph(headElement, url) {
     const title =
-      this.getOpenGraph("title", headElement) ||
+      this.getOpenGraph(headElement, "title") ||
       headElement.querySelector("title")?.textContent;
     const faviconUrl = headElement.querySelector("link[rel*='icon']")?.href;
     const siteMatchName = url.match(SITE_NAME_REGEX);
     const siteName =
-      this.getOpenGraph(["site_name", "article:author"], headElement) ||
+      this.getOpenGraph(headElement, ["site_name", "article:author"]) ||
       (siteMatchName && siteMatchName[1]);
 
     return {
@@ -290,11 +290,7 @@ export class AppService {
     };
   }
 
-  getOpenGraph(properties, headElement) {
-    if (!Array.isArray(properties)) {
-      properties = [properties];
-    }
-
+  getOpenGraph(headElement, ...properties) {
     return properties
       .map(
         (property) =>
