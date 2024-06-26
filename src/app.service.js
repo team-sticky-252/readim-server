@@ -10,7 +10,7 @@ const EXCLUDED_CLASS_NAMES_REGEX =
 const EXCLUDED_ID_REGEX = /(paging|player|sidebar)/i;
 const MAIN_CONTENT_TAGS_REGEX = /^(main|article|section)$/i;
 const MAIN_CONTENT_CSS_REGEX =
-  /^(tt_article_useless_p_margin|area_view|contents_style|contents_style|article_skin)$/i;
+  /(tt_article_useless_p_margin|area_view|contents_style|contents_style|article_skin)/i;
 const MAIN_CONTENT_SELECTOR_NAME = [
   "#article-view",
   "#mArticle",
