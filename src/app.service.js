@@ -279,7 +279,7 @@ export class AppService {
     const faviconUrl = headElement.querySelector("link[rel*='icon']")?.href;
     const siteMatchName = url.match(SITE_NAME_REGEX);
     const siteName =
-      this.getOpenGraph("site_name", headElement) ||
+      this.getOpenGraph(["site_name", "article:author"], headElement) ||
       (siteMatchName && siteMatchName[1]);
 
     return {
@@ -290,10 +290,19 @@ export class AppService {
     };
   }
 
-  getOpenGraph(property, headElement) {
-    return headElement.querySelector(
-      `meta[property='og:${property}'], meta[name='${property}']`,
-    )?.content;
+  getOpenGraph(properties, headElement) {
+    if (!Array.isArray(properties)) {
+      properties = [properties];
+    }
+
+    return properties
+      .map(
+        (property) =>
+          headElement.querySelector(
+            `meta[property='og:${property}'], meta[name='${property}']`,
+          )?.content,
+      )
+      .find((content) => content !== undefined);
   }
 
   formatHttpURL(url) {
