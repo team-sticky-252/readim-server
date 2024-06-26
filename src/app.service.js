@@ -45,17 +45,15 @@ export class AppService {
     }
   }
 
-  getReadingTime(bodyElement, wpm) {
-    const mainContent = this.getMainContent(bodyElement);
+  getReadingTime(bodyElement, wpm, url) {
+    const mainContent = this.getMainContent(bodyElement, url);
 
     return this.calculateReadingTime(mainContent, wpm);
   }
 
-  async getMainContent(url) {
-    const { bodyElement } = await this.getHtmlElement(url);
-
+  getMainContent(bodyElement, url) {
     try {
-      return await this.getSemanticMainContent(bodyElement);
+      return this.getSemanticMainContent(bodyElement);
     } catch (error) {
       if (url.includes("velog.io")) {
         return this.getVelogMainContent(bodyElement);

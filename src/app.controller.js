@@ -21,7 +21,11 @@ export class AppController {
 
       const { headElement, bodyElement } =
         await this.appService.getHtmlElement(formattedURL);
-      const readingTime = this.appService.getReadingTime(bodyElement, wpm);
+      const readingTime = this.appService.getReadingTime(
+        bodyElement,
+        wpm,
+        formattedURL,
+      );
       const siteOpenGraph = this.appService.getSiteOpenGraph(
         headElement,
         formattedURL,
@@ -57,7 +61,10 @@ export class AppController {
     try {
       const formattedURL = this.appService.formatHttpURL(url);
 
-      const article = await this.appService.getMainContent(formattedURL);
+      const { bodyElement } =
+        await this.appService.getHtmlElement(formattedURL);
+
+      const article = this.appService.getMainContent(bodyElement, formattedURL);
 
       return response.status(HttpStatus.OK.statusCode).send({
         statusCode: HttpStatus.OK.statusCode,
