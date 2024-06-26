@@ -21,11 +21,7 @@ export class AppController {
 
       const { headElement, bodyElement } =
         await this.appService.getHtmlElement(formattedURL);
-      const readingTime = this.appService.getReadingTime(
-        formattedURL,
-        bodyElement,
-        wpm,
-      );
+      const readingTime = this.appService.getReadingTime(bodyElement, wpm);
       const siteOpenGraph = this.appService.getSiteOpenGraph(
         headElement,
         formattedURL,
@@ -61,9 +57,7 @@ export class AppController {
     try {
       const formattedURL = this.appService.formatHttpURL(url);
 
-      const { bodyElement } =
-        await this.appService.getHtmlElement(formattedURL);
-      const article = this.appService.getMainContent(bodyElement);
+      const article = await this.appService.getMainContent(formattedURL);
 
       return response.status(HttpStatus.OK.statusCode).send({
         statusCode: HttpStatus.OK.statusCode,
@@ -81,70 +75,6 @@ export class AppController {
       const { statusCode, message } = HttpStatus.INTERNAR_SERVER_ERROR;
 
       return response.status(statusCode).send({ statusCode, message });
-    }
-  }
-
-  @Get("/velog")
-  @Bind(Req(), Res())
-  async getArticlebody(request, response) {
-    const { url } = request.query;
-
-    const formattedURL = this.appService.formatHttpURL(url);
-
-    const { bodyElement } = await this.appService.getHtmlElement(formattedURL);
-    const article = this.appService.getVelogMainContent(bodyElement);
-
-    return response.status(HttpStatus.OK.statusCode).send({
-      statusCode: HttpStatus.OK.statusCode,
-      data: {
-        article,
-      },
-    });
-  }
-
-  @Get("/tistory")
-  @Bind(Req(), Res())
-  async getTistoryArticle(request, response) {
-    const { url } = request.query;
-
-    try {
-      const formattedURL = this.appService.formatHttpURL(url);
-
-      const { bodyElement } =
-        await this.appService.getHtmlElement(formattedURL);
-      const article = this.appService.getMainContent(bodyElement);
-
-      return response.status(HttpStatus.OK.statusCode).send({
-        statusCode: HttpStatus.OK.statusCode,
-        data: {
-          article,
-        },
-      });
-    } catch (e) {
-      try {
-        const formattedURL = this.appService.formatHttpURL(url);
-
-        const { bodyElement } =
-          await this.appService.getHtmlElement(formattedURL);
-        const article = this.appService.getTistoryMainContent(bodyElement);
-
-        return response.status(HttpStatus.OK.statusCode).send({
-          statusCode: HttpStatus.OK.statusCode,
-          data: {
-            article,
-          },
-        });
-      } catch (error) {
-        if (error instanceof HttpError) {
-          const { statusCode, message } = error.getError();
-
-          return response.status(statusCode).send({ statusCode, message });
-        }
-
-        const { statusCode, message } = HttpStatus.INTERNAR_SERVER_ERROR;
-
-        return response.status(statusCode).send({ statusCode, message });
-      }
     }
   }
 }
