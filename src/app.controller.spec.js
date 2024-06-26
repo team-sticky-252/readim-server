@@ -148,7 +148,7 @@ describe("AppController", () => {
 
       const mainContentElements =
         appService.reduceSemanticMainContent(bodyElement);
-      const content = appService.getMainContent(bodyElement);
+      const content = appService.getSemanticMainContent(bodyElement);
 
       expect(mainContentElements.length).toBe(2);
       expect(content).toBe("title section1 section2 div1 div2 div3 div4");

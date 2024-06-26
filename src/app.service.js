@@ -45,19 +45,13 @@ export class AppService {
     }
   }
 
-  getReadingTime(url, bodyElement, wpm) {
-    if (url.includes("velog.io")) {
-      const velogMainContent = this.getVelogMainContent(bodyElement);
-
-      return this.calculateReadingTime(velogMainContent, wpm);
-    }
-
+  getReadingTime(bodyElement, wpm) {
     const mainContent = this.getMainContent(bodyElement);
 
     return this.calculateReadingTime(mainContent, wpm);
   }
 
-  getMainContent(bodyElement) {
+  getSemanticMainContent(bodyElement) {
     const mainContentElements = this.reduceSemanticMainContent(bodyElement);
 
     const contents = mainContentElements.reduce((acc, element) => {
@@ -337,5 +331,23 @@ export class AppService {
     }, []);
 
     return mainArticle.join(" ").trim().replace(/\\/g, "");
+  }
+
+  async getMainContent(url) {
+    const { bodyElement } = await this.getHtmlElement(url);
+
+    try {
+      return await this.getSemanticMainContent(bodyElement);
+    } catch (error) {
+      if (url.includes("velog.io")) {
+        return this.getVelogMainContent(bodyElement);
+      }
+
+      if (url.includes("tistory.com")) {
+        return this.getTistoryMainContent(bodyElement);
+      }
+    }
+
+    return null;
   }
 }
