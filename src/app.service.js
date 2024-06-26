@@ -51,6 +51,45 @@ export class AppService {
     return this.calculateReadingTime(mainContent, wpm);
   }
 
+  async getMainContent(url) {
+    const { bodyElement } = await this.getHtmlElement(url);
+
+    try {
+      return await this.getSemanticMainContent(bodyElement);
+    } catch (error) {
+      if (url.includes("velog.io")) {
+        return this.getVelogMainContent(bodyElement);
+      }
+
+      if (url.includes("tistory.com")) {
+        return this.getTistoryMainContent(bodyElement);
+      }
+
+      throw error;
+    }
+  }
+
+  calculateReadingTime(articleBody, wpm) {
+    const numOfWords = articleBody.split(" ").length;
+    const rawReadingTime = (numOfWords / wpm) * 60 * 1000;
+    let readingMinutes = Math.floor(rawReadingTime / 1000 / 60);
+    let readingSeconds =
+      Math.round((rawReadingTime / 1000 - readingMinutes * 60) * 0.1) * 10;
+
+    if (readingSeconds >= 45) {
+      readingMinutes += 1;
+      readingSeconds = 0;
+    } else if (readingSeconds >= 15) {
+      readingSeconds = 30;
+    } else {
+      readingSeconds = 0;
+    }
+
+    const readingTimePerMs = readingMinutes * 60 * 1000 + readingSeconds * 1000;
+
+    return readingTimePerMs;
+  }
+
   getSemanticMainContent(bodyElement) {
     const mainContentElements = this.reduceSemanticMainContent(bodyElement);
 
@@ -235,27 +274,6 @@ export class AppService {
     return CodeText;
   }
 
-  calculateReadingTime(articleBody, wpm) {
-    const numOfWords = articleBody.split(" ").length;
-    const rawReadingTime = (numOfWords / wpm) * 60 * 1000;
-    let readingMinutes = Math.floor(rawReadingTime / 1000 / 60);
-    let readingSeconds =
-      Math.round((rawReadingTime / 1000 - readingMinutes * 60) * 0.1) * 10;
-
-    if (readingSeconds >= 45) {
-      readingMinutes += 1;
-      readingSeconds = 0;
-    } else if (readingSeconds >= 15) {
-      readingSeconds = 30;
-    } else {
-      readingSeconds = 0;
-    }
-
-    const readingTimePerMs = readingMinutes * 60 * 1000 + readingSeconds * 1000;
-
-    return readingTimePerMs;
-  }
-
   getSiteOpenGraph(headElement, url) {
     const title =
       this.getOpenGraph("title", headElement) ||
@@ -331,23 +349,5 @@ export class AppService {
     }, []);
 
     return mainArticle.join(" ").trim().replace(/\\/g, "");
-  }
-
-  async getMainContent(url) {
-    const { bodyElement } = await this.getHtmlElement(url);
-
-    try {
-      return await this.getSemanticMainContent(bodyElement);
-    } catch (error) {
-      if (url.includes("velog.io")) {
-        return this.getVelogMainContent(bodyElement);
-      }
-
-      if (url.includes("tistory.com")) {
-        return this.getTistoryMainContent(bodyElement);
-      }
-    }
-
-    return null;
   }
 }
