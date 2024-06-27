@@ -1,3 +1,10 @@
 {
-  "language": "js"
+  "language": "js",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src",
+  "entryFile": "main",
+  "compilerOptions": {
+    "builder": "babel",
+    "webpack": false
+  }
 }
