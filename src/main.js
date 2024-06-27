@@ -3,12 +3,13 @@ import { AppModule } from "./app.module";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  const port = process.env.SERVER_PORT || 3000;
   app.enableCors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://testreadim.netlify.app/"],
     methods: "GET",
   });
 
-  await app.listen(3000);
+  await app.listen(port);
 }
+
 bootstrap();
