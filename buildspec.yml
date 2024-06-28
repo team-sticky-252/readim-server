@@ -1,22 +1,25 @@
-version: 0.2
-
+artifacts:
+  base-directory: dist
+  files:
+  - '**/*'
+eb_codebuild_settings:
+  Image: aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0
+  artifacts:
+    base-directory: dist
+    discard-paths: true
 phases:
-  install:
-    runtime-versions:
-      nodejs: 18
-    commands:
-      - npm install -g @nestjs/cli
-  pre_build:
-    commands:
-      - npm install
   build:
     commands:
-      - npm run build
+    - npm run build
+  install:
+    commands:
+    - npm install -g @nestjs/cli
+    runtime-versions:
+      nodejs: 18
   post_build:
     commands:
-      - echo Build completed on `date`
-
-artifacts:
-  files:
-    - '**/*'
-  base-directory: dist
+    - echo Build completed on `date`
+  pre_build:
+    commands:
+    - npm install
+version: 0.2

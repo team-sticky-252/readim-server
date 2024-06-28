@@ -390,3 +390,9 @@ Temporary Items
 dokcer-compose.yml
 .env
 /dist
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+/dist
