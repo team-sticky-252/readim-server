@@ -45,12 +45,6 @@ export class AppService {
     }
   }
 
-  getReadingTime(bodyElement, wpm, url) {
-    const mainContent = this.getMainContent(bodyElement, url);
-
-    return this.calculateReadingTime(mainContent, wpm);
-  }
-
   getMainContent(bodyElement, url) {
     try {
       return this.getSemanticMainContent(bodyElement);
