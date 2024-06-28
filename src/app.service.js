@@ -274,6 +274,7 @@ export class AppService {
     const siteMatchName = url.match(SITE_NAME_REGEX);
     const siteName =
       this.getOpenGraph(headElement, "site_name", "article:author") ||
+      this.getOpenGraph(headElement, "twitter:site")?.split("@")[1] ||
       (siteMatchName && siteMatchName[1]);
 
     return {
