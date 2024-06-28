@@ -273,7 +273,7 @@ export class AppService {
     const faviconUrl = headElement.querySelector("link[rel*='icon']")?.href;
     const siteMatchName = url.match(SITE_NAME_REGEX);
     const siteName =
-      this.getOpenGraph(headElement, ["site_name", "article:author"]) ||
+      this.getOpenGraph(headElement, "site_name", "article:author") ||
       (siteMatchName && siteMatchName[1]);
 
     return {
