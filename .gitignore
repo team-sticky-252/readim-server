@@ -395,4 +395,3 @@ dokcer-compose.yml
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
-/dist
