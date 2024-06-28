@@ -21,11 +21,17 @@ export class AppController {
 
       const { headElement, bodyElement } =
         await this.appService.getHtmlElement(formattedURL);
-      const readingTime = this.appService.getReadingTime(
+
+      const mainContent = this.appService.getMainContent(
         bodyElement,
-        wpm,
         formattedURL,
       );
+
+      const readingTime = this.appService.calculateReadingTime(
+        mainContent,
+        wpm,
+      );
+
       const siteOpenGraph = this.appService.getSiteOpenGraph(
         headElement,
         formattedURL,
@@ -36,6 +42,7 @@ export class AppController {
         data: {
           id: uuid(),
           readingTime,
+          mainContent,
           ...siteOpenGraph,
           createDate: new Date().toISOString(),
         },
