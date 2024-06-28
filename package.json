@@ -6,7 +6,7 @@
   },
   "scripts": {
     "format": "prettier --write \"**/*.js\"",
-    "build": "nest build",
+    "build": "tsc -p jsconfig.build.json",
     "start": "babel-node index.js",
     "start:dev": "nodemon",
     "test": "jest",
