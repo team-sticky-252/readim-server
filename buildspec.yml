@@ -1,3 +1,4 @@
+<<<<<<< feature-31-01
 artifacts:
   base-directory: dist
   files:
@@ -23,3 +24,27 @@ phases:
     commands:
     - npm install
 version: 0.2
+=======
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - npm install -g @nestjs/cli
+  pre_build:
+    commands:
+      - npm install
+  build:
+    commands:
+      - npm run build
+  post_build:
+    commands:
+      - echo Build completed on `date`
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: dist
+>>>>>>> main

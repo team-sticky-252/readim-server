@@ -45,12 +45,6 @@ export class AppService {
     }
   }
 
-  getReadingTime(bodyElement, wpm, url) {
-    const mainContent = this.getMainContent(bodyElement, url);
-
-    return this.calculateReadingTime(mainContent, wpm);
-  }
-
   getMainContent(bodyElement, url) {
     try {
       return this.getSemanticMainContent(bodyElement);
@@ -279,7 +273,8 @@ export class AppService {
     const faviconUrl = headElement.querySelector("link[rel*='icon']")?.href;
     const siteMatchName = url.match(SITE_NAME_REGEX);
     const siteName =
-      this.getOpenGraph(headElement, ["site_name", "article:author"]) ||
+      this.getOpenGraph(headElement, "site_name", "article:author") ||
+      this.getOpenGraph(headElement, "twitter:site")?.split("@")[1] ||
       (siteMatchName && siteMatchName[1]);
 
     return {

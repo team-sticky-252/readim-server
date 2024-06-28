@@ -1,4 +1,5 @@
 {
+<<<<<<< feature-31-01
   "presets": [
     [
       "@babel/preset-env",
@@ -16,4 +17,7 @@
       }
     ]
   ]
+=======
+  "presets": [["@babel/preset-env", { "targets": { "node": "current" } }]]
+>>>>>>> main
 }
