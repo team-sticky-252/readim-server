@@ -1,53 +1,6 @@
-<<<<<<< feature-31-01
-artifacts:
-  base-directory: dist
-  files:
-  - '**/*'
-eb_codebuild_settings:
-  Image: aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0
-  artifacts:
-    base-directory: dist
-    discard-paths: true
-phases:
-  build:
-    commands:
-    - npm run build
-  install:
-    commands:
-    - npm install -g @nestjs/cli
-    runtime-versions:
-      nodejs: 18
-  post_build:
-    commands:
-    - echo Build completed on `date`
-  pre_build:
-    commands:
-    - npm install
-version: 0.2
-=======
 version: 0.2
 
-artifacts:
-  base-directory: dist
-  files:
-  - '**/*'
-eb_codebuild_settings:
-  Image: aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0
-  artifacts:
-    base-directory: dist
-    discard-paths: true
 phases:
-  build:
-    commands:
-    - npm run build
-  install:
-    commands:
-    - npm install -g @nestjs/cli
-    runtime-versions:
-      nodejs: 18
-  post_build:
-    commands:
-    - echo Build completed on `date`
   pre_build:
     commands:
       - npm install
@@ -59,6 +12,27 @@ phases:
       - echo Build completed on `date`
 
 artifacts:
+  base-directory: dist
   files:
     - '**/*'
-  base-directory: dist
+
+eb_codebuild_settings:
+  Image: aws/codebuild/eb-nodejs-6.10.0-amazonlinux-64:4.0.0
+  artifacts:
+    base-directory: dist
+    discard-paths: true
+  phases:
+    install:
+      commands:
+        - npm install -g @nestjs/cli
+      runtime-versions:
+        nodejs: 18
+    pre_build:
+      commands:
+        - npm install
+    build:
+      commands:
+        - npm run build
+    post_build:
+      commands:
+        - echo Build completed on `date`
