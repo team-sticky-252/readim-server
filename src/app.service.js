@@ -63,7 +63,7 @@ export class AppService {
 
   calculateReadingTime(articleBody, wpm) {
     const numOfWords = articleBody.split(" ").length;
-    const readingTimeMs = (numOfWords / wpm) * 60 * 1000;
+    const readingTimeMs = Math.floor((numOfWords / wpm) * 60 * 1000);
 
     return readingTimeMs;
   }
