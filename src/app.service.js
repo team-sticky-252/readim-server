@@ -151,7 +151,7 @@ export class AppService {
   convertCodeTagToText(element) {
     const tagName = element.tagName.toLowerCase();
 
-    if (tagName === "code") {
+    if (tagName === "pre" || tagName === "code") {
       const text = this.convertCodeToText(element.textContent);
 
       element.innerHTML = text;
