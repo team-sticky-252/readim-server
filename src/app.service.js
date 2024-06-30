@@ -243,13 +243,13 @@ export class AppService {
   }
 
   convertCodeToText(code) {
-    const CodeText = code
+    const codeText = code
       .replace(/([a-z])([A-Z])/g, "$1 $2")
       .replace(/[{}\[\]\(\)<>\/;┤├┌─┐└┘┬┴┼│\./"/'/`@,:=\-_!|+?$*\\]/g, " ")
       .replace(/\s+/g, " ")
       .trim();
 
-    return CodeText;
+    return codeText;
   }
 
   getSiteOpenGraph(headElement, url) {
