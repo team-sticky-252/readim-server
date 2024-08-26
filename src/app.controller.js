@@ -1,8 +1,15 @@
-import { Controller, Dependencies, Get, Bind, Req, Res } from "@nestjs/common";
+import {
+  Controller,
+  Dependencies,
+  Get,
+  Bind,
+  Req,
+  Res,
+  HttpStatus,
+} from "@nestjs/common";
 import { v4 as uuid } from "uuid";
 
 import { AppService } from "./app.service";
-import { HttpError, HttpStatus } from "./utils/http";
 
 @Controller()
 @Dependencies(AppService)
@@ -16,48 +23,33 @@ export class AppController {
   async getArticleSummary(request, response) {
     const { url, wpm = 202 } = request.query;
 
-    try {
-      const formattedURL = this.appService.formatHttpURL(url);
+    const formattedURL = this.appService.formatHttpURL(url);
 
-      const { headElement, bodyElement } =
-        await this.appService.getHtmlElement(formattedURL);
+    const { headElement, bodyElement } =
+      await this.appService.getHtmlElement(formattedURL);
 
-      const mainContent = this.appService.getMainContent(
-        bodyElement,
-        formattedURL,
-      );
+    const mainContent = this.appService.getMainContent(
+      bodyElement,
+      formattedURL,
+    );
 
-      const readingTime = this.appService.calculateReadingTime(
+    const readingTime = this.appService.calculateReadingTime(mainContent, wpm);
+
+    const siteOpenGraph = this.appService.getSiteOpenGraph(
+      headElement,
+      formattedURL,
+    );
+
+    return response.status(HttpStatus.OK).send({
+      statusCode: HttpStatus.OK,
+      data: {
+        id: uuid(),
+        readingTime,
         mainContent,
-        wpm,
-      );
-
-      const siteOpenGraph = this.appService.getSiteOpenGraph(
-        headElement,
-        formattedURL,
-      );
-
-      return response.status(HttpStatus.OK.statusCode).send({
-        statusCode: HttpStatus.OK.statusCode,
-        data: {
-          id: uuid(),
-          readingTime,
-          mainContent,
-          ...siteOpenGraph,
-          createDate: new Date().toISOString(),
-        },
-      });
-    } catch (error) {
-      if (error instanceof HttpError) {
-        const { statusCode, message } = error.getError();
-
-        return response.status(statusCode).send({ statusCode, message });
-      }
-
-      const { statusCode, message } = HttpStatus.INTERNAR_SERVER_ERROR;
-
-      return response.status(statusCode).send({ statusCode, message });
-    }
+        ...siteOpenGraph,
+        createDate: new Date().toISOString(),
+      },
+    });
   }
 
   @Get("/article")
@@ -65,30 +57,17 @@ export class AppController {
   async getArticle(request, response) {
     const { url } = request.query;
 
-    try {
-      const formattedURL = this.appService.formatHttpURL(url);
+    const formattedURL = this.appService.formatHttpURL(url);
 
-      const { bodyElement } =
-        await this.appService.getHtmlElement(formattedURL);
+    const { bodyElement } = await this.appService.getHtmlElement(formattedURL);
 
-      const article = this.appService.getMainContent(bodyElement, formattedURL);
+    const article = this.appService.getMainContent(bodyElement, formattedURL);
 
-      return response.status(HttpStatus.OK.statusCode).send({
-        statusCode: HttpStatus.OK.statusCode,
-        data: {
-          article,
-        },
-      });
-    } catch (error) {
-      if (error instanceof HttpError) {
-        const { statusCode, message } = error.getError();
-
-        return response.status(statusCode).send({ statusCode, message });
-      }
-
-      const { statusCode, message } = HttpStatus.INTERNAR_SERVER_ERROR;
-
-      return response.status(statusCode).send({ statusCode, message });
-    }
+    return response.status(HttpStatus.OK).send({
+      statusCode: HttpStatus.OK,
+      data: {
+        article,
+      },
+    });
   }
 }
