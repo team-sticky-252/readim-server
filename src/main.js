@@ -1,5 +1,7 @@
 import { NestFactory } from "@nestjs/core";
+
 import { AppModule } from "./app.module";
+import TransformInterceptor from "./common/interceptors/response.intercepter";
 import ExceptionFilter from "./common/exceptions/filters/exception.filter";
 
 async function bootstrap() {
@@ -10,6 +12,7 @@ async function bootstrap() {
     methods: "GET",
   });
 
+  app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalFilters(new ExceptionFilter());
 
   await app.listen(port);
