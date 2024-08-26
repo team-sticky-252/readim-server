@@ -1,7 +1,7 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Dependencies } from "@nestjs/common";
 import jsdom from "jsdom";
 
-import { HttpError, HttpStatus } from "./utils/http";
+import { ErrorService } from "./common/exceptions/error.service";
 
 const EXCLUDED_TAGS_REGEX =
   /^(button|img|nav|aside|footer|audio|canvas|embed|iframe|map|area|noscript|object|option|optgroup|picture|progress|script|select|source|style|svg|meta)$/i;
@@ -29,7 +29,12 @@ const NODE = {
 };
 
 @Injectable()
+@Dependencies(ErrorService)
 export class AppService {
+  constructor(errorService) {
+    this.errorService = errorService;
+  }
+
   async getHtmlElement(url) {
     try {
       const { JSDOM } = jsdom;
@@ -41,24 +46,24 @@ export class AppService {
         bodyElement: document.documentElement.querySelector("body"),
       };
     } catch (error) {
-      throw new HttpError(HttpStatus.BAD_URL);
+      throw this.errorService.handleBadUrlError();
     }
   }
 
   getMainContent(bodyElement, url) {
-    try {
-      return this.getSemanticMainContent(bodyElement);
-    } catch (error) {
-      if (url.includes("velog.io")) {
-        return this.getVelogMainContent(bodyElement);
-      }
+    const mainContent = this.getSemanticMainContent(bodyElement);
 
-      if (url.includes("tistory.com")) {
-        return this.getTistoryMainContent(bodyElement);
-      }
+    if (mainContent !== "") return mainContent;
 
-      throw error;
+    if (url.includes("velog.io")) {
+      return this.getVelogMainContent(bodyElement);
     }
+
+    if (url.includes("tistory.com")) {
+      return this.getTistoryMainContent(bodyElement);
+    }
+
+    throw this.errorService.handleParseError();
   }
 
   calculateReadingTime(articleBody, wpm) {
@@ -77,10 +82,6 @@ export class AppService {
 
       return acc.concat(this.parseElementIntoTextContent(element));
     }, []);
-
-    if (contents.length === 0) {
-      throw new HttpError(HttpStatus.PARSE_ERROR);
-    }
 
     return contents.join(" ");
   }

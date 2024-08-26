@@ -1,5 +1,6 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
+import ExceptionFilter from "./common/exceptions/filters/exception.filter";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -8,6 +9,8 @@ async function bootstrap() {
     origin: ["http://localhost:5173", "https://testreadim.netlify.app/"],
     methods: "GET",
   });
+
+  app.useGlobalFilters(new ExceptionFilter());
 
   await app.listen(port);
 }
