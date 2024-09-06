@@ -1,6 +1,6 @@
 {
   "name": "readim",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "main": "dist/main.js",
   "engines": {
     "node": "18.16.0"
