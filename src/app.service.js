@@ -1,9 +1,10 @@
-import { Injectable, Dependencies, Logger } from "@nestjs/common";
+import { Injectable, Dependencies } from "@nestjs/common";
 import jsdom from "jsdom";
 import puppeteer from "puppeteer";
-import { ErrorService } from "./common/exceptions/error.service";
 
-const logger = new Logger("AppService");
+import { ErrorService } from "./common/exceptions/error.service";
+import CustomLoggerService from "./common/customLogger/custom-logger.service";
+
 const EXCLUDED_TAGS_REGEX =
   /^(button|img|nav|aside|footer|audio|canvas|embed|iframe|map|area|noscript|object|option|optgroup|picture|progress|script|select|source|style|svg|meta)$/i;
 const EXCLUDED_CLASS_NAMES_REGEX =
@@ -30,10 +31,11 @@ const NODE = {
 };
 
 @Injectable()
-@Dependencies(ErrorService)
+@Dependencies(ErrorService, CustomLoggerService)
 export class AppService {
-  constructor(errorService) {
+  constructor(errorService, customLoggerService) {
     this.errorService = errorService;
+    this.logger = customLoggerService;
   }
 
   async getHtmlElement(url) {
@@ -47,7 +49,7 @@ export class AppService {
         bodyElement: document.documentElement.querySelector("body"),
       };
     } catch (error) {
-      logger.error(`in getHtmlElement: ${error.message}, ${error.stack}`);
+      this.logger.error(`in getHtmlElement: ${error.message}, ${error.stack}`);
       throw this.errorService.handleBadUrlError();
     }
   }
@@ -460,7 +462,7 @@ export class AppService {
     const bodyElement = dom.window.document.body;
 
     if (!bodyElement) {
-      logger.error("Body element is undefined");
+      this.logger.error("Body element is undefined");
 
       throw this.errorService.handleParseError();
     }
@@ -491,12 +493,14 @@ export class AppService {
     });
 
     if (bestElement) {
+      this.logger.log(`best: ${bestElement.tagName}, Score: ${bestScore}`);
+
       const mainText = this.parseElementIntoTextContent(bestElement);
 
       return mainText;
     }
 
-    logger.error("No best element found.");
+    this.logger.error("No best element found.");
 
     throw this.errorService.handleParseError();
   }
