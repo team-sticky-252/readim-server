@@ -1,10 +1,11 @@
-import { Injectable, Dependencies } from "@nestjs/common";
+import { Injectable, Dependencies, Logger } from "@nestjs/common";
 import jsdom from "jsdom";
 import puppeteer from "puppeteer";
 
 import { ErrorService } from "./common/exceptions/error.service";
 import CustomLoggerService from "./common/customLogger/custom-logger.service";
 
+const logger = new Logger("AppService");
 const EXCLUDED_TAGS_REGEX =
   /^(button|img|nav|aside|footer|audio|canvas|embed|iframe|map|area|noscript|object|option|optgroup|picture|progress|script|select|source|style|svg|meta)$/i;
 const EXCLUDED_CLASS_NAMES_REGEX =
