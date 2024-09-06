@@ -361,7 +361,7 @@ export class AppService {
       const textLength = element.textContent.trim().length;
       const allElements = element.querySelectorAll("*");
       const linkElements = element.querySelectorAll("a");
-      const linkRatio = linkElements.length / (allElements.length + 1 || 1);
+      const linkRatio = linkElements.length / (allElements.length + 1);
 
       if (textLength === 0) {
         return;
@@ -399,6 +399,7 @@ export class AppService {
       const tagName = data.element.tagName.toLowerCase();
       const className = data.element.className.toLowerCase();
       const id = data.element.id.toLowerCase();
+
       data.textLengthScore =
         ((data.textLength * (1 - data.linkRatio)) / maxTextLength) * 100;
 
