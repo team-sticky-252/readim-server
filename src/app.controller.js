@@ -17,7 +17,7 @@ export class AppController {
     const { headElement, bodyElement } =
       await this.appService.getHtmlElement(formattedURL);
 
-    const mainContent = this.appService.getMainContent(
+    const mainContent = await this.appService.getMainContent(
       bodyElement,
       formattedURL,
     );
@@ -44,7 +44,10 @@ export class AppController {
 
     const { bodyElement } = await this.appService.getHtmlElement(formattedURL);
 
-    const article = this.appService.getMainContent(bodyElement, formattedURL);
+    const article = await this.appService.getMainContent(
+      bodyElement,
+      formattedURL,
+    );
 
     return { article };
   }
