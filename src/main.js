@@ -8,7 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = process.env.SERVER_PORT || 8080;
   app.enableCors({
-    origin: ["http://localhost:5173", "https://testreadim.netlify.app/"],
+    origin: ["http://localhost:5173", "https://testreadim.netlify.app"],
     methods: "GET",
   });
 
