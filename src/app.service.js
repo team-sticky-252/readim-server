@@ -1,8 +1,9 @@
-import { Injectable, Dependencies } from "@nestjs/common";
+import { Injectable, Dependencies, Logger } from "@nestjs/common";
 import jsdom from "jsdom";
-
+import puppeteer from "puppeteer";
 import { ErrorService } from "./common/exceptions/error.service";
 
+const logger = new Logger("AppService");
 const EXCLUDED_TAGS_REGEX =
   /^(button|img|nav|aside|footer|audio|canvas|embed|iframe|map|area|noscript|object|option|optgroup|picture|progress|script|select|source|style|svg|meta)$/i;
 const EXCLUDED_CLASS_NAMES_REGEX =
@@ -46,21 +47,30 @@ export class AppService {
         bodyElement: document.documentElement.querySelector("body"),
       };
     } catch (error) {
+      logger.error(`in getHtmlElement: ${error.message}, ${error.stack}`);
       throw this.errorService.handleBadUrlError();
     }
   }
 
-  getMainContent(bodyElement, url) {
-    const mainContent = this.getSemanticMainContent(bodyElement);
-
-    if (mainContent !== "") return mainContent;
-
+  async getMainContent(bodyElement, url) {
     if (url.includes("velog.io")) {
       return this.getVelogMainContent(bodyElement);
     }
 
     if (url.includes("tistory.com")) {
       return this.getTistoryMainContent(bodyElement);
+    }
+
+    const mainContent = this.getSemanticMainContent(bodyElement);
+
+    if (mainContent !== "") {
+      return mainContent;
+    }
+
+    const bestElement = await this.extractMainContent(url);
+
+    if (bestElement || mainContent.length <= 200) {
+      return bestElement;
     }
 
     throw this.errorService.handleParseError();
@@ -94,7 +104,7 @@ export class AppService {
       const tagName = currentElement.tagName.toLowerCase();
       const { className, id } = currentElement;
 
-      if (EXCLUDED_TAGS_REGEX.test(tagName)) {
+      if (EXCLUDED_TAGS_REGEX.test(tagName) && id !== "mainFrame") {
         const { parentElement } = currentElement;
 
         parentElement.removeChild(currentElement);
@@ -115,7 +125,9 @@ export class AppService {
   }
 
   convertElementsWithRules(element) {
-    const stack = Array.from(element.children).reverse();
+    if (!element) return;
+
+    const stack = [element];
 
     while (stack.length > 0) {
       const currentElement = stack.pop();
@@ -130,7 +142,7 @@ export class AppService {
   }
 
   addSpaceBetweenTags(element) {
-    if (!element.nextSibling) {
+    if (!element || !element.nextSibling) {
       return;
     }
 
@@ -150,6 +162,8 @@ export class AppService {
   }
 
   convertCodeTagToText(element) {
+    if (!element) return;
+
     const tagName = element.tagName.toLowerCase();
 
     if (tagName === "pre" || tagName === "code") {
@@ -334,5 +348,155 @@ export class AppService {
     }, []);
 
     return mainArticle.join(" ").trim().replace(/\\/g, "");
+  }
+
+  gatherElementData(rootElement) {
+    const elementsData = [];
+
+    const traverse = (element, depth) => {
+      if (depth > 20 || !element) {
+        return;
+      }
+
+      const textLength = element.textContent.trim().length;
+      const allElements = element.querySelectorAll("*");
+      const linkElements = element.querySelectorAll("a");
+      const linkRatio = linkElements.length / (allElements.length + 1 || 1);
+
+      if (textLength === 0) {
+        return;
+      }
+
+      const elementData = {
+        element,
+        textLength,
+        linkRatio,
+      };
+
+      elementsData.push(elementData);
+
+      for (let i = 0; i < element.children.length; i += 1) {
+        traverse(element.children[i], depth + 1);
+      }
+    };
+
+    for (let i = 0; i < rootElement.children.length; i += 1) {
+      traverse(rootElement.children[i], 0);
+    }
+
+    return elementsData;
+  }
+
+  assignRelativeScores(elementsData) {
+    const maxTextLength = Math.max(
+      ...elementsData.map((data) => data.textLength),
+    );
+
+    elementsData.forEach((data) => {
+      const allElements = elementsData.length;
+      const childrenElements = data.element.childElementCount + 1;
+      const elementRatio = 1 - childrenElements / allElements;
+      const tagName = data.element.tagName.toLowerCase();
+      const className = data.element.className.toLowerCase();
+      const id = data.element.id.toLowerCase();
+      data.textLengthScore =
+        ((data.textLength * (1 - data.linkRatio)) / maxTextLength) * 100;
+
+      if (tagName === "main") {
+        data.tagNameScore = 10;
+      } else if (tagName === "article") {
+        data.tagNameScore = 30;
+      } else if (tagName === "section") {
+        data.tagNameScore = 30;
+      } else {
+        data.tagNameScore = 0;
+      }
+
+      if (className.includes("article")) {
+        data.classNameScore = 30;
+      } else {
+        data.classNameScore = 0;
+      }
+
+      if (id.includes("article")) {
+        data.idScore = 30;
+      } else {
+        data.idScore = 0;
+      }
+
+      const linkPenalty = data.linkRatio * -100;
+
+      data.totalScore =
+        (data.textLengthScore * 0.1 +
+          data.tagNameScore * 0.7 +
+          data.classNameScore * 0.5 +
+          data.idScore * 0.5 +
+          linkPenalty) *
+        elementRatio;
+    });
+  }
+
+  async extractMainContent(url) {
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+
+    await page.goto(url, { waitUntil: "networkidle0" });
+
+    const iframeElement = await page.$("iframe#mainFrame");
+    let html;
+
+    if (iframeElement) {
+      const frame = await iframeElement.contentFrame();
+      html = await frame.content();
+    } else {
+      html = await page.content();
+    }
+
+    await browser.close();
+
+    const { JSDOM } = jsdom;
+    const dom = new JSDOM(html);
+    const bodyElement = dom.window.document.body;
+
+    if (!bodyElement) {
+      logger.error("Body element is undefined");
+
+      throw this.errorService.handleParseError();
+    }
+
+    this.removeExcludedTags(bodyElement);
+    this.convertElementsWithRules(bodyElement);
+
+    const elementsData = this.gatherElementData(bodyElement);
+
+    this.assignRelativeScores(elementsData);
+
+    let bestElement = null;
+    let bestScore = 0;
+
+    elementsData.forEach((data) => {
+      const totalLinkElements = data.element.querySelectorAll("a").length;
+      const totalElements = data.element.querySelectorAll("*").length + 1;
+      const linkRatio = totalLinkElements / totalElements;
+
+      if (
+        linkRatio < 0.7 &&
+        data.totalScore > bestScore &&
+        data.element.tagName !== "A"
+      ) {
+        bestScore = data.totalScore;
+        bestElement = data.element;
+      }
+    });
+
+    if (bestElement) {
+      const mainText = this.parseElementIntoTextContent(bestElement);
+
+      return mainText;
+    }
+
+    logger.error("No best element found.");
+
+    throw this.errorService.handleParseError();
   }
 }
