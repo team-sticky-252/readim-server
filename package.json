@@ -8,14 +8,14 @@
   "scripts": {
     "format": "prettier --write \"**/*.js\"",
     "build": "tsc -p jsconfig.build.json",
-    "start": "node dist/main.js",
+    "start": "node check-puppeteer-path.js && node dist/main.js",
     "start:prod": "babel-node index.js",
     "start:dev": "nodemon",
     "test": "jest",
     "test:cov": "jest --coverage",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "lint-staged": "lint-staged",
-    "postinstall": "node check-puppeteer-path.js"
+    "postinstall": ""
   },
   "dependencies": {
     "@babel/register": "^7.18.6",
