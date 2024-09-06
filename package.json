@@ -14,7 +14,8 @@
     "test": "jest",
     "test:cov": "jest --coverage",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "lint-staged": "lint-staged"
+    "lint-staged": "lint-staged",
+    "postinstall": "node check-puppeteer-path.js"
   },
   "dependencies": {
     "@babel/register": "^7.18.6",
@@ -24,6 +25,7 @@
     "globals": "^15.6.0",
     "jsdom": "^25.0.0",
     "puppeteer": "^23.3.0",
+    "puppeteer-core": "^23.3.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.5.5",
     "uuid": "^10.0.0"
