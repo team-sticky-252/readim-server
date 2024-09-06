@@ -1,8 +1,11 @@
 const puppeteer = require("puppeteer");
-const { join } = require("path");
 
 (async () => {
-  const browserFetcher = puppeteer.createBrowserFetcher();
-  const revisionInfo = await browserFetcher.download("r128.0.6613.119");
-  console.log("Puppeteer installed Chrome path:", revisionInfo.executablePath);
+  try {
+    const browser = await puppeteer.launch();
+    console.log("Puppeteer is using Chrome from:", browser._process.spawnfile);
+    await browser.close();
+  } catch (error) {
+    console.error("Error launching Puppeteer:", error);
+  }
 })();
