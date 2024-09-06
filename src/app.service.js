@@ -63,7 +63,7 @@ export class AppService {
 
     const mainContent = this.getSemanticMainContent(bodyElement);
 
-    if (mainContent !== "") {
+    if (mainContent !== "" && mainContent.length > 200) {
       return mainContent;
     }
 
