@@ -6,11 +6,11 @@ import { ErrorService } from "./common/exceptions/error.service";
 const EXCLUDED_TAGS_REGEX =
   /^(button|img|nav|aside|footer|audio|canvas|embed|iframe|map|area|noscript|object|option|optgroup|picture|progress|script|select|source|style|svg|meta)$/i;
 const EXCLUDED_CLASS_NAMES_REGEX =
-  /(button|btn|nav|footer|summary|author|comment|sns|share|card|activity|relate|another|reply|sr-only|post-switch|loof|revenue|act|tag|direction|og|notice|tag|rpost|list-unstyled)/i;
+  /\b(button|btn|nav|footer|summary|author|comment|sns|share|card|activity|relate|another|reply|sr-only|post-switch|loof|revenue|act|direction|og|notice|rpost|list-unstyled)\b/i;
 const EXCLUDED_ID_REGEX = /(paging|player|sidebar)/i;
 const MAIN_CONTENT_TAGS_REGEX = /^(main|article|section)$/i;
 const MAIN_CONTENT_CSS_REGEX =
-  /(tt_article_useless_p_margin|area_view|contents_style|contents_style|article_skin)/i;
+  /(tt_article_useless_p_margin|area_view|contents_style|article_skin)/i;
 const MAIN_CONTENT_SELECTOR_NAME = [
   "#article-view",
   "#mArticle",
