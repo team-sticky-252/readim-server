@@ -443,6 +443,19 @@ export class AppService {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
 
+    await page.setRequestInterception(true);
+    page.on("request", (request) => {
+      if (
+        ["image", "stylesheet", "font", "media"].includes(
+          request.resourceType(),
+        )
+      ) {
+        request.abort();
+      } else {
+        request.continue();
+      }
+    });
+
     await page.goto(url, { waitUntil: "networkidle0" });
 
     const iframeElement = await page.$("iframe#mainFrame");
