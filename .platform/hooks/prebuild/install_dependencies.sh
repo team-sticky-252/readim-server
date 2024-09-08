@@ -1,0 +1,30 @@
+sudo yum install -y \
+  atk \
+  cups-libs \
+  libXcomposite \
+  libXcursor \
+  libXdamage \
+  libXext \
+  libXi \
+  libXtst \
+  pango \
+  alsa-lib \
+  gtk3 \
+  ipa-gothic-fonts \
+  xorg-x11-fonts-100dpi \
+  xorg-x11-fonts-75dpi \
+  xorg-x11-utils \
+  xorg-x11-fonts-cyrillic \
+  xorg-x11-fonts-Type1 \
+  xorg-x11-fonts-misc \
+  libXrandr \
+  libXinerama \
+  libXrender \
+  libXss \
+  libXft \
+  libXtst \
+  libgtk-3-0 \
+  libnss3 \
+  libnspr4 \
+  libx11-xcb1 \
+  libdbus-glib-1-2
