@@ -1,4 +1,12 @@
-import { Controller, Dependencies, Get, Query } from "@nestjs/common";
+import {
+  Controller,
+  Dependencies,
+  Get,
+  Bind,
+  Req,
+  Res,
+  HttpStatus,
+} from "@nestjs/common";
 import { v4 as uuid } from "uuid";
 
 import { AppService } from "./app.service";
@@ -11,35 +19,41 @@ export class AppController {
   }
 
   @Get("/articleSummary")
-  async getArticleSummary(@Query("url") url, @Query("wpm") wpm = 202) {
+  @Bind(Req(), Res())
+  async getArticleSummary(request, response) {
+    const { url, wpm = 202 } = request.query;
+
     const formattedURL = this.appService.formatHttpURL(url);
 
     const { headElement, bodyElement } =
       await this.appService.getHtmlElement(formattedURL);
-
     const mainContent = await this.appService.getMainContent(
       bodyElement,
       formattedURL,
     );
-
     const readingTime = this.appService.calculateReadingTime(mainContent, wpm);
-
     const siteOpenGraph = this.appService.getSiteOpenGraph(
       headElement,
       formattedURL,
     );
 
-    return {
-      id: uuid(),
-      readingTime,
-      mainContent,
-      ...siteOpenGraph,
-      createDate: new Date().toISOString(),
-    };
+    return response.status(HttpStatus.OK).send({
+      statusCode: HttpStatus.OK,
+      data: {
+        id: uuid(),
+        readingTime,
+        mainContent,
+        ...siteOpenGraph,
+        createDate: new Date().toISOString(),
+      },
+    });
   }
 
   @Get("/article")
-  async getArticle(@Query("url") url) {
+  @Bind(Req(), Res())
+  async getArticle(request, response) {
+    const { url } = request.query;
+
     const formattedURL = this.appService.formatHttpURL(url);
 
     const { bodyElement } = await this.appService.getHtmlElement(formattedURL);
@@ -49,6 +63,11 @@ export class AppController {
       formattedURL,
     );
 
-    return { article };
+    return response.status(HttpStatus.OK).send({
+      statusCode: HttpStatus.OK,
+      data: {
+        article,
+      },
+    });
   }
 }
