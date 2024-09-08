@@ -389,6 +389,7 @@ Temporary Items
 # Local
 dokcer-compose.yml
 .env
+.cache
 /dist
 
 # Elastic Beanstalk Files
