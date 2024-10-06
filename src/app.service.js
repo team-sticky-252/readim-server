@@ -442,8 +442,6 @@ export class AppService {
   }
 
   async extractMainContent(url) {
-    console.time();
-    console.log("Start Puppeteer");
     function browserCloseTimer() {
       if (browserCloseTimeout) {
         clearTimeout(browserCloseTimeout);
@@ -529,8 +527,6 @@ export class AppService {
 
       const mainText = this.parseElementIntoTextContent(bestElement);
 
-      console.log("End Puppeteer");
-      console.timeEnd();
       return mainText;
     }
 
