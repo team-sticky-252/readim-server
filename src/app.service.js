@@ -29,6 +29,8 @@ const NODE = {
   ELEMENT_NODE: 1,
   TEXT_NODE: 3,
 };
+let headlessBrowser = null;
+let browserCloseTimeout = null;
 
 @Injectable()
 @Dependencies(ErrorService, CustomLoggerService)
@@ -440,8 +442,25 @@ export class AppService {
   }
 
   async extractMainContent(url) {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
+    console.time();
+    console.log("Start Puppeteer");
+    function browserCloseTimer() {
+      if (browserCloseTimeout) {
+        clearTimeout(browserCloseTimeout);
+      }
+
+      browserCloseTimeout = setTimeout(async () => {
+        if (headlessBrowser && headlessBrowser.isConnected()) {
+          await headlessBrowser.close();
+        }
+      }, 300000);
+    }
+
+    if (!headlessBrowser || !headlessBrowser.isConnected()) {
+      headlessBrowser = await puppeteer.launch();
+    }
+
+    const page = await headlessBrowser.newPage();
 
     await page.setRequestInterception(true);
     page.on("request", (request) => {
@@ -468,7 +487,7 @@ export class AppService {
       html = await page.content();
     }
 
-    await browser.close();
+    browserCloseTimer();
 
     const { JSDOM } = jsdom;
     const dom = new JSDOM(html);
@@ -510,6 +529,8 @@ export class AppService {
 
       const mainText = this.parseElementIntoTextContent(bestElement);
 
+      console.log("End Puppeteer");
+      console.timeEnd();
       return mainText;
     }
 
