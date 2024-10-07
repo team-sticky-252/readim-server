@@ -1,9 +1,9 @@
 import { Injectable, Dependencies } from "@nestjs/common";
 import jsdom from "jsdom";
-import puppeteer from "puppeteer";
 
 import { ErrorService } from "./common/exceptions/error.service";
 import CustomLoggerService from "./common/customLogger/custom-logger.service";
+import BrowserService from "./classes/BrowserService";
 
 const EXCLUDED_TAGS_REGEX =
   /^(button|img|nav|aside|footer|audio|canvas|embed|iframe|map|area|noscript|object|option|optgroup|picture|progress|script|select|source|style|svg|meta)$/i;
@@ -29,8 +29,6 @@ const NODE = {
   ELEMENT_NODE: 1,
   TEXT_NODE: 3,
 };
-let headlessBrowser = null;
-let browserCloseTimeout = null;
 
 @Injectable()
 @Dependencies(ErrorService, CustomLoggerService)
@@ -442,50 +440,10 @@ export class AppService {
   }
 
   async extractMainContent(url) {
-    function browserCloseTimer() {
-      if (browserCloseTimeout) {
-        clearTimeout(browserCloseTimeout);
-      }
+    const browser = BrowserService.getInstance();
+    const html = await browser.visitPage(url);
 
-      browserCloseTimeout = setTimeout(async () => {
-        if (headlessBrowser && headlessBrowser.isConnected()) {
-          await headlessBrowser.close();
-        }
-      }, 300000);
-    }
-
-    if (!headlessBrowser || !headlessBrowser.isConnected()) {
-      headlessBrowser = await puppeteer.launch();
-    }
-
-    const page = await headlessBrowser.newPage();
-
-    await page.setRequestInterception(true);
-    page.on("request", (request) => {
-      if (
-        ["image", "stylesheet", "font", "media"].includes(
-          request.resourceType(),
-        )
-      ) {
-        request.abort();
-      } else {
-        request.continue();
-      }
-    });
-
-    await page.goto(url, { waitUntil: "networkidle0" });
-
-    const iframeElement = await page.$("iframe#mainFrame");
-    let html;
-
-    if (iframeElement) {
-      const frame = await iframeElement.contentFrame();
-      html = await frame.content();
-    } else {
-      html = await page.content();
-    }
-
-    browserCloseTimer();
+    browser.startBrowserCloseTimer();
 
     const { JSDOM } = jsdom;
     const dom = new JSDOM(html);
